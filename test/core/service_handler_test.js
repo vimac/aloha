@@ -1,5 +1,5 @@
 const createServiceHandler = require('../../src/core/service_handler');
-
+const {addMiddleware} = require('../../src/core/middleware');
 const assert = require('assert');
 
 const fakeServiceDef = {
@@ -43,6 +43,30 @@ describe('service handler test', () => {
     const container = createServiceHandler(fakeServiceDef, fakeServiceImpl); 
     container.hello(callStub, (error, result) => {
       assert(error.message, 'nothing', 'error.message should be "nothing"');
+    });
+  });
+
+  it('test middlewares', () => {
+    const fakeServiceImpl = {
+      'hello' : async (request, context, metadata) => {
+        return {'keyTest': 'valueTest'}
+      }
+    }
+
+    addMiddleware(async(request, context, metadata, next) => {
+      assert.notEqual(request['fake'], 'modified');
+      request['fake'] = 'modified';
+      await next();
+    });
+
+    addMiddleware(async(request, context, metadata, next) => {
+      assert.equal(request['fake'], 'modified');
+      await next();
+    });
+
+    const container = createServiceHandler(fakeServiceDef, fakeServiceImpl); 
+    container.hello(callStub, (error, result) => {
+      assert(result['keyTest'], 'valueTest', 'result should equal to fakeServiceImpl return value');
     });
   });
 

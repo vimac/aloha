@@ -1,8 +1,8 @@
 function isPlainObject(obj) {
-  return  typeof obj === 'object' // separate from primitives
-      && obj !== null         // is obvious
-      && obj.constructor === Object // separate instances (Array, DOM, ...)
-      && Object.prototype.toString.call(obj) === '[object Object]'; // separate build-in like Math
+  return  typeof obj === 'object' 
+      && obj !== null
+      && obj.constructor === Object 
+      && Object.prototype.toString.call(obj) === '[object Object]';
 }
 
 module.exports = {
