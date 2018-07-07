@@ -1,5 +1,6 @@
 const createServiceHandler = require('../../src/core/service_handler');
-const {addMiddleware} = require('../../src/core/middleware');
+const {addMiddleware, clearMiddlewares} = require('../../src/core/middleware');
+const Service = require('../../src/core/service');
 const assert = require('assert');
 
 const fakeServiceDef = {
@@ -68,7 +69,24 @@ describe('service handler test', () => {
     container.hello(callStub, (error, result) => {
       assert.equal(result['keyTest'], 'modified', 'result should equal to modified data');
     });
+
+    clearMiddlewares();
   });
 
+  it('service instance test', () => {
+
+    class FakeService extends Service {
+      async 'hello' (request, context, metadata) {
+        assert.equal(this.ctx['hello'], 'appContextTest')
+        return {'keyTest': 'ServiceTest'}
+      }
+    }
+
+    const container = createServiceHandler(fakeServiceDef, FakeService, {'hello': 'appContextTest'}); 
+    container.hello(callStub, (error, result) => {
+      assert.equal(result['keyTest'], 'ServiceTest', 'result should equal to FakeService return value');
+    });
+
+  });
 })
 

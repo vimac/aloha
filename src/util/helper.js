@@ -5,6 +5,10 @@ function isPlainObject(obj) {
       && Object.prototype.toString.call(obj) === '[object Object]';
 }
 
+function isConstructor(obj) {
+  return !!obj.prototype && !!obj.prototype.constructor.name;
+}
+
 module.exports = {
-  isPlainObject
+  isPlainObject, isConstructor
 };

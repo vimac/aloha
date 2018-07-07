@@ -1,5 +1,7 @@
-const {getMiddlewares} = require('./middleware')
+const {getMiddlewares} = require('./middleware');
 const GRPCMetadata = require('grpc').Metadata;
+const {isConstructor} = require('../util/helper');
+const Service = require('./service');
 
 class RequestContext {
 
@@ -9,7 +11,7 @@ class RequestContext {
 
 }
 
-const createRealImplementionMethodForService = (serviceImpl, methodName) => {
+const createRealImplementionMethodForService = (serviceImplInstance, methodName) => {
   return (call, callback) => {
     try {
       const context = new RequestContext();
@@ -21,7 +23,7 @@ const createRealImplementionMethodForService = (serviceImpl, methodName) => {
           new Promise(
             (resolve, reject) => {
               try {
-                resolve(middleware.apply(serviceImpl, [call.request, context, call.metadata, next]));
+                resolve(middleware.apply(serviceImplInstance, [call.request, context, call.metadata, next]));
               } catch (e) {
                 reject(e);
               }
@@ -35,7 +37,7 @@ const createRealImplementionMethodForService = (serviceImpl, methodName) => {
       next();
       new Promise((resolve, reject) => {
         try {
-          resolve(serviceImpl[methodName].apply(serviceImpl, [call.request, context, call.metadata]));
+          resolve(serviceImplInstance[methodName].apply(serviceImplInstance, [call.request, context, call.metadata]));
         } catch (e) {
           reject(e);
         }
@@ -52,19 +54,30 @@ const createRealImplementionMethodForService = (serviceImpl, methodName) => {
   };
 }
 
-const createServiceHandler = (service, serviceImpl) => {
+const createServiceHandler = (service, serviceImpl, appContext) => {
 
   let container = {};
+  let serviceImplInstance;
+
+  if (serviceImpl.prototype && serviceImpl.prototype instanceof Service) {
+    serviceImplInstance = new serviceImpl(appContext);
+  } else if (isConstructor(serviceImpl)) {
+    serviceImplInstance = new serviceImpl();
+  } else {
+    serviceImplInstance = serviceImpl;
+  }
+  if (serviceImplInstance.ctx == null) {
+    serviceImplInstance.ctx = appContext;
+  }
 
   Object.keys(service).forEach(methodName => {
 
-    if (typeof serviceImpl[methodName] != 'function') {
+    if (typeof serviceImplInstance[methodName] != 'function') {
       // method not impl
       return;
     }
 
-    container[methodName] = createRealImplementionMethodForService(serviceImpl, methodName);
-
+    container[methodName] = createRealImplementionMethodForService(serviceImplInstance, methodName);
   });
 
   return container;

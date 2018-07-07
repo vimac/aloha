@@ -9,5 +9,9 @@ function getMiddlewares() {
   return middlewareStacks;
 }
 
-module.exports = {addMiddleware, getMiddlewares};
+function clearMiddlewares() {
+  middlewareStacks = [];
+}
+
+module.exports = {addMiddleware, getMiddlewares, clearMiddlewares};
 
