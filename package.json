@@ -9,7 +9,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "grpc": "1.12.4",
+    "grpc": "1.13.0",
     "log4js": "2.10.0"
   },
   "devDependencies": {
