@@ -29,7 +29,7 @@ describe('service handler test', () => {
     }
     const container = createServiceHandler(fakeServiceDef, fakeServiceImpl); 
     container.hello(callStub, (error, result) => {
-      assert(result['keyTest'], 'valueTest', 'result should equal to fakeServiceImpl return value');
+      assert.equal(result['keyTest'], 'valueTest', 'result should equal to fakeServiceImpl return value');
     });
   });
 
@@ -42,17 +42,11 @@ describe('service handler test', () => {
     }
     const container = createServiceHandler(fakeServiceDef, fakeServiceImpl); 
     container.hello(callStub, (error, result) => {
-      assert(error.message, 'nothing', 'error.message should be "nothing"');
+      assert.equal(error.message, 'nothing', 'error.message should be "nothing"');
     });
   });
 
   it('test middlewares', () => {
-    const fakeServiceImpl = {
-      'hello' : async (request, context, metadata) => {
-        return {'keyTest': 'valueTest'}
-      }
-    }
-
     addMiddleware(async(request, context, metadata, next) => {
       assert.notEqual(request['fake'], 'modified');
       request['fake'] = 'modified';
@@ -64,9 +58,15 @@ describe('service handler test', () => {
       await next();
     });
 
+    const fakeServiceImpl = {
+      'hello' : async (request, context, metadata) => {
+        return {'keyTest': request['fake']}
+      }
+    }
+
     const container = createServiceHandler(fakeServiceDef, fakeServiceImpl); 
     container.hello(callStub, (error, result) => {
-      assert(result['keyTest'], 'valueTest', 'result should equal to fakeServiceImpl return value');
+      assert.equal(result['keyTest'], 'modified', 'result should equal to modified data');
     });
   });
 
