@@ -3,6 +3,8 @@ const GRPCMetadata = require('grpc').Metadata;
 const {isConstructor} = require('../util/helper');
 const Service = require('./service');
 
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+
 class RequestContext {
 
   constructor() {
@@ -72,7 +74,7 @@ const createServiceHandler = (service, serviceImpl, appContext) => {
 
   Object.keys(service).forEach(methodName => {
 
-    if (typeof serviceImplInstance[methodName] != 'function') {
+    if (!serviceImplInstance[methodName] instanceof AsyncFunction || typeof serviceImplInstance[methodName] != 'function') {
       // method not impl
       return;
     }
