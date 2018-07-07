@@ -88,5 +88,21 @@ describe('service handler test', () => {
     });
 
   });
+
+  it('non standard service instance test', () => {
+
+    class FakeService {
+      async 'hello' (request, context, metadata) {
+        assert.equal(this.ctx['hello'], 'appContextTest')
+        return {'keyTest': 'ServiceTest'}
+      }
+    }
+
+    const container = createServiceHandler(fakeServiceDef, FakeService, {'hello': 'appContextTest'}); 
+    container.hello(callStub, (error, result) => {
+      assert.equal(result['keyTest'], 'ServiceTest', 'result should equal to FakeService return value');
+    });
+
+  });
 })
 
