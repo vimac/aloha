@@ -1,5 +1,5 @@
-const GRPCServer = require('../../src/core/grpc_server');
-const createGRPCClient = require('../../src/core/grpc_client');
+const {ServerWrapper} = require('../../src/core/server_wrapper');
+const createGRPCClient = require('../../src/core/client_wrapper');
 
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
@@ -15,7 +15,7 @@ const createTestServerAndClient = (serverImpl) => {
   let proto = protoLoader.loadSync('test.proto', {includeDirs: [__dirname + '/../share/']});
   let package = grpc.loadPackageDefinition(proto);
 
-  let server = new GRPCServer('127.0.0.1', port);
+  let server = new ServerWrapper('127.0.0.1', port);
   server.bind(package['TestService'].service, serverImpl);
 
   let clientWrapper = createGRPCClient('127.0.0.1', port, package['TestService']);

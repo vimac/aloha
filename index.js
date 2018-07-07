@@ -1,5 +1,5 @@
 'use strict'
 
-const {Application} = require('./src/core/application');
+const {ServerWrapper} = require('./src/core/server_wrapper');
 
-module.exports = Application;
+module.exports = ServerWrapper;

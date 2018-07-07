@@ -1,10 +1,18 @@
-const Context = require('./context')
 const {getMiddlewares} = require('./middleware')
+const GRPCMetadata = require('grpc').Metadata;
+
+class RequestContext {
+
+  constructor() {
+    this.metadata = new GRPCMetadata();
+  }
+
+}
 
 const createRealImplementionMethodForService = (serviceImpl, methodName) => {
   return (call, callback) => {
     try {
-      const context = new Context();
+      const context = new RequestContext();
       let middlewares = getMiddlewares().slice(0);
       let currentIndex = 0;
       const next = () => {

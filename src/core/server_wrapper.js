@@ -1,11 +1,19 @@
 const grpc = require('grpc');
 const createServiceHandler = require('./service_handler')
+const {addMiddleware} = require("./middleware");
 
-class GRPCServer {
+let currentInstance = null;
+
+const getCurrentServerInstance = () => {
+  return currentInstance;
+}
+
+class ServerWrapper {
 
   constructor(address, port) {
     this._server = new grpc.Server();
     this._server.bind(address + ':' + port, grpc.ServerCredentials.createInsecure())
+    return this;
   }
 
   bind(service, impl) {
@@ -27,6 +35,10 @@ class GRPCServer {
     this._server.forceShutdown();
   }
 
+  use (middleware) {
+    addMiddleware(middleware);
+  }
+
 }
 
-module.exports = GRPCServer;
+module.exports = {ServerWrapper, getCurrentServerInstance};
