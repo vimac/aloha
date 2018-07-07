@@ -1,6 +1,7 @@
 const grpc = require('grpc');
 const createServiceHandler = require('./service_handler')
 const {addMiddleware} = require("./middleware");
+const Service = require('./service');
 
 let currentInstance = null;
 
@@ -13,7 +14,8 @@ class ServerWrapper {
   constructor(address, port) {
     this._server = new grpc.Server();
     this._server.bind(address + ':' + port, grpc.ServerCredentials.createInsecure())
-    return this;
+
+    this.Service = Service;
   }
 
   bind(service, impl) {
