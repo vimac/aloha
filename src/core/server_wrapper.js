@@ -25,14 +25,6 @@ class ServerWrapper {
     this._server.addService(service, createServiceHandler(service, impl));
   }
 
-  bindMap(map) {
-    Object.keys(map).forEach(
-      (k => {
-        this.bind(k, map[k]);
-      }).bind(this)
-    );
-  }
-
   start(...args) {
     this._server.start(...args);
   }
